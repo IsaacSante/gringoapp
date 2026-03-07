@@ -1,98 +1,121 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Audio } from 'expo-av';
+import { useEffect, useRef, useState } from 'react';
+import { FlatList, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { IconSymbol } from '@/components/ui/icon-symbol';
+
+const TRACKS = [
+  {
+    id: '1',
+    name: 'Song One',
+    description: 'A cool track',
+    src: require('@/assets/audio/song1.mp3'),
+  },
+  {
+    id: '2',
+    name: 'Song Two',
+    description: 'Another cool track',
+    src: require('@/assets/audio/song2.mp3'),
+  },
+];
+
+type Track = typeof TRACKS[0];
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const insets = useSafeAreaInsets();
+  const soundRef = useRef<Audio.Sound | null>(null);
+  const [playingId, setPlayingId] = useState<string | null>(null);
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  useEffect(() => {
+    Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
+    return () => { soundRef.current?.unloadAsync(); };
+  }, []);
+
+  const handlePress = async (track: Track) => {
+    if (soundRef.current) {
+      await soundRef.current.unloadAsync();
+      soundRef.current = null;
+    }
+
+    if (playingId === track.id) {
+      setPlayingId(null);
+      return;
+    }
+
+    const { sound } = await Audio.Sound.createAsync(track.src);
+    soundRef.current = sound;
+    setPlayingId(track.id);
+    await sound.playAsync();
+
+    sound.setOnPlaybackStatusUpdate((status) => {
+      if (status.isLoaded && status.didJustFinish) setPlayingId(null);
+    });
+  };
+
+  return (
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{
+        paddingTop: insets.top + 20,
+        paddingHorizontal: 20,
+        paddingBottom: 40,
+      }}>
+      <ThemedText type="title" style={styles.title}>GRINGO</ThemedText>
+      <FlatList
+        data={TRACKS}
+        keyExtractor={(item) => item.id}
+        scrollEnabled={false}
+        renderItem={({ item }) => {
+          const isPlaying = playingId === item.id;
+          return (
+            <TouchableOpacity onPress={() => handlePress(item)}>
+              <ThemedView style={[styles.row, isPlaying && styles.rowActive]}>
+                <IconSymbol
+                  name={isPlaying ? 'pause.fill' : 'play.fill'}
+                  size={20}
+                  color={isPlaying ? '#4a9eff' : '#888'}
+                />
+                <View style={styles.trackInfo}>
+                  <ThemedText type="defaultSemiBold">{item.name}</ThemedText>
+                  <ThemedText style={styles.description}>{item.description}</ThemedText>
+                </View>
+              </ThemedView>
+            </TouchableOpacity>
+          );
+        }}
+      />
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    flex: 1,
+  },
+  title: {
+    marginBottom: 24,
+  },
+  row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 14,
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 10,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  rowActive: {
+    borderWidth: 1,
+    borderColor: '#4a9eff44',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  trackInfo: {
+    flex: 1,
+    gap: 3,
+  },
+  description: {
+    fontSize: 13,
+    opacity: 0.5,
   },
 });
