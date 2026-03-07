@@ -1,11 +1,10 @@
 import { Audio } from 'expo-av';
 import { useEffect, useRef, useState } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
+import TrackRow from '@/components/track-row';
 
 const TRACKS = [
   { id: '1', name: 'know what u know', description: '', src: require('@/assets/audio/song1.mp3') },
@@ -65,24 +64,15 @@ export default function HomeScreen() {
       }}>
       <ThemedText type="title" style={styles.title}>GRINGO</ThemedText>
       <View>
-        {TRACKS.map((item) => {
-          const isPlaying = playingId === item.id;
-          return (
-            <TouchableOpacity key={item.id} onPress={() => handlePress(item)}>
-              <ThemedView style={[styles.row, isPlaying && styles.rowActive]}>
-                <IconSymbol
-                  name={isPlaying ? 'pause.fill' : 'play.fill'}
-                  size={20}
-                  color={isPlaying ? '#4a9eff' : '#888'}
-                />
-                <View style={styles.trackInfo}>
-                  <ThemedText type="defaultSemiBold">{item.name}</ThemedText>
-                  <ThemedText style={styles.description}>{item.description}</ThemedText>
-                </View>
-              </ThemedView>
-            </TouchableOpacity>
-          );
-        })}
+        {TRACKS.map((item) => (
+          <TrackRow
+            key={item.id}
+            name={item.name}
+            description={item.description}
+            isPlaying={playingId === item.id}
+            onPress={() => handlePress(item)}
+          />
+        ))}
       </View>
     </ScrollView>
   );
