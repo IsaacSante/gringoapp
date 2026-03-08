@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
@@ -24,28 +24,21 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
 
   return (
-  <LinearGradient
-  colors={['#e3670e', '#1a0800']}
-  style={{ flex: 1 }}>
-  <ScrollView
-    style={styles.container}
-    contentContainerStyle={{
-      paddingTop: insets.top + 20,
-      paddingHorizontal: 20,
-      paddingBottom: 40,
-    }}>
-    <ThemedText type="title" style={styles.title}>GRINGO</ThemedText>
-    <TrackContainer tracks={TRACKS} />
-  </ScrollView>
-</LinearGradient>
+    <LinearGradient colors={['#e3670e', '#1a0800']} style={styles.gradient}>
+      <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
+        <ThemedText type="title">GRINGO</ThemedText>
+      </View>
+      <TrackContainer tracks={TRACKS} />
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  gradient: {
     flex: 1,
   },
-  title: {
-    marginBottom: 24,
+  header: {
+    flex: 1,
+    paddingHorizontal: 20,
   },
 });
