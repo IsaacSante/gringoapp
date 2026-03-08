@@ -1,10 +1,8 @@
-import { Audio } from 'expo-av';
-import { useEffect, useRef, useState } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
-import TrackRow from '@/components/track-row';
+import TrackContainer from '@/components/track-container';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const TRACKS = [
@@ -22,38 +20,8 @@ const TRACKS = [
   { id: '12', name: 'if i die tomorrow', description: '', src: require('@/assets/audio/song1.mp3') },
 ];
 
-type Track = typeof TRACKS[0];
-
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
-  const soundRef = useRef<Audio.Sound | null>(null);
-  const [playingId, setPlayingId] = useState<string | null>(null);
-
-  useEffect(() => {
-    Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
-    return () => { soundRef.current?.unloadAsync(); };
-  }, []);
-
-  const handlePress = async (track: Track) => {
-    if (soundRef.current) {
-      await soundRef.current.unloadAsync();
-      soundRef.current = null;
-    }
-
-    if (playingId === track.id) {
-      setPlayingId(null);
-      return;
-    }
-
-    const { sound } = await Audio.Sound.createAsync(track.src);
-    soundRef.current = sound;
-    setPlayingId(track.id);
-    await sound.playAsync();
-
-    sound.setOnPlaybackStatusUpdate((status) => {
-      if (status.isLoaded && status.didJustFinish) setPlayingId(null);
-    });
-  };
 
   return (
   <LinearGradient
@@ -67,16 +35,7 @@ export default function HomeScreen() {
       paddingBottom: 40,
     }}>
     <ThemedText type="title" style={styles.title}>GRINGO</ThemedText>
-    {TRACKS.map((item, i) => (
-      <TrackRow
-        key={item.id}
-        index={i + 1}
-        name={item.name}
-        description={item.description}
-        isPlaying={playingId === item.id}
-        onPress={() => handlePress(item)}
-      />
-    ))}
+    <TrackContainer tracks={TRACKS} />
   </ScrollView>
 </LinearGradient>
   );
@@ -88,25 +47,5 @@ const styles = StyleSheet.create({
   },
   title: {
     marginBottom: 24,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 10,
-  },
-  rowActive: {
-    borderWidth: 1,
-    borderColor: '#4a9eff44',
-  },
-  trackInfo: {
-    flex: 1,
-    gap: 3,
-  },
-  description: {
-    fontSize: 13,
-    opacity: 0.5,
   },
 });
