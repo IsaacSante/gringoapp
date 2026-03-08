@@ -1,5 +1,4 @@
 import { ThemedText } from '@/components/themed-text';
-import { IconSymbol } from '@/components/ui/icon-symbol';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 type Props = {
@@ -23,11 +22,6 @@ export default function TrackRow({ index, name, description, isPlaying, onPress 
             <ThemedText style={styles.description} numberOfLines={1}>{description}</ThemedText>
           ) : null}
         </View>
-        <IconSymbol
-          name={isPlaying ? 'pause.fill' : 'play.fill'}
-          size={10}
-          color={isPlaying ? '#fff' : '#444'}
-        />
       </View>
     </TouchableOpacity>
   );

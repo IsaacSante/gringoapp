@@ -1,8 +1,9 @@
 import { Audio } from 'expo-av';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, LayoutChangeEvent, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Animated, LayoutChangeEvent, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import ScrollIndicator from '@/components/scroll-indicator';
 import TrackRow from '@/components/track-row';
 
 const IDLE_TIMEOUT_MS = 4000;
@@ -28,11 +29,12 @@ export default function TrackContainer({ tracks }: Props) {
 
   const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scrollY = useRef(new Animated.Value(0)).current;
-  const viewportHeight = useRef(0);
-  const contentHeight = useRef(0);
+  const [viewportHeight, setViewportHeight] = useState(0);
+  const [contentHeight, setContentHeight] = useState(0);
   const animHeight = useRef(new Animated.Value(screenHeight / 3)).current;
   const scrollRef = useRef<ScrollView>(null);
   const rowOffsets = useRef<number[]>([]);
+  const [rowHeight, setRowHeight] = useState(0);
 
   const collapsedHeight = screenHeight / 3;
   const expandedHeight = (screenHeight * 2) / 3;
@@ -105,44 +107,32 @@ export default function TrackContainer({ tracks }: Props) {
     });
   };
 
-  const thumbHeight = Math.max(
-    20,
-    (viewportHeight.current / Math.max(contentHeight.current, 1)) * viewportHeight.current
-  );
-  const maxThumbOffset = viewportHeight.current - thumbHeight;
-  const maxScroll = Math.max(1, contentHeight.current - viewportHeight.current);
 
   return (
     <Animated.View style={[styles.container, { height: animHeight }]}>
-      <Pressable
-        onPress={expand}
-        // @ts-ignore – onHoverIn is web-only
-        onHoverIn={expand}
-        style={styles.handle}
-      >
-        <View style={styles.pill} />
-      </Pressable>
-
       <View style={styles.scrollWrapper}>
         <ScrollView
           ref={scrollRef}
           style={styles.scroll}
           contentContainerStyle={[
             styles.scrollContent,
-            { paddingBottom: collapsedHeight },
+            { paddingBottom: Math.max(0, collapsedHeight - rowHeight) },
           ]}
           showsVerticalScrollIndicator={false}
           scrollEventThrottle={16}
           onScroll={onScrollHandler}
           onScrollBeginDrag={resetIdleTimer}
           onMomentumScrollEnd={resetIdleTimer}
-          onLayout={(e: LayoutChangeEvent) => { viewportHeight.current = e.nativeEvent.layout.height; }}
-          onContentSizeChange={(_w: number, h: number) => { contentHeight.current = h; }}
+          onLayout={(e: LayoutChangeEvent) => { setViewportHeight(e.nativeEvent.layout.height); }}
+          onContentSizeChange={(_w: number, h: number) => { setContentHeight(h); }}
         >
           {tracks.map((track, i) => (
             <View
               key={track.id}
-              onLayout={(e) => { rowOffsets.current[i] = e.nativeEvent.layout.y; }}
+              onLayout={(e) => {
+                rowOffsets.current[i] = e.nativeEvent.layout.y;
+                if (i === 0 && !rowHeight) setRowHeight(e.nativeEvent.layout.height);
+              }}
             >
               <TrackRow
                 index={i + 1}
@@ -155,25 +145,13 @@ export default function TrackContainer({ tracks }: Props) {
           ))}
         </ScrollView>
 
-        {expanded && (
-          <View style={styles.scrollbarTrack} pointerEvents="none">
-            <Animated.View
-              style={[
-                styles.scrollbarThumb,
-                {
-                  height: thumbHeight,
-                  transform: [{
-                    translateY: scrollY.interpolate({
-                      inputRange: [0, maxScroll],
-                      outputRange: [0, maxThumbOffset],
-                      extrapolate: 'clamp',
-                    }),
-                  }],
-                },
-              ]}
-            />
-          </View>
-        )}
+        <ScrollIndicator
+          scrollY={scrollY}
+          viewportHeight={viewportHeight}
+          contentHeight={contentHeight}
+          bottomPadding={Math.max(0, collapsedHeight - rowHeight)}
+          collapsedHeight={collapsedHeight}
+        />
       </View>
     </Animated.View>
   );
@@ -183,16 +161,6 @@ const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
   },
-  handle: {
-    alignItems: 'center',
-    paddingVertical: 10,
-  },
-  pill: {
-    width: 36,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: '#ffffff33',
-  },
   scrollWrapper: {
     flex: 1,
     position: 'relative',
@@ -201,19 +169,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 20,
-  },
-  scrollbarTrack: {
-    position: 'absolute',
-    right: 4,
-    top: 0,
-    bottom: 0,
-    width: 2,
-    justifyContent: 'flex-start',
-  },
-  scrollbarThumb: {
-    width: 2,
-    borderRadius: 1,
-    backgroundColor: '#ffffff44',
+    paddingLeft: 46,
+    paddingRight: 46,
   },
 });

@@ -24,7 +24,7 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
 
   return (
-    <LinearGradient colors={['#e3670e', '#1a0800']} style={styles.gradient}>
+    <LinearGradient colors={['#e8f0fe', '#4a6fa5']} style={styles.gradient}>
       <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
         <ThemedText type="title">GRINGO</ThemedText>
       </View>
