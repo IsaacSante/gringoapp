@@ -1,24 +1,20 @@
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 type Props = {
+  index: number;
   name: string;
   description: string;
   isPlaying: boolean;
   onPress: () => void;
 };
 
-export default function TrackRow({ name, description, isPlaying, onPress }: Props) {
+export default function TrackRow({ index, name, description, isPlaying, onPress }: Props) {
   return (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.6}>
-      <ThemedView style={[styles.row, isPlaying && styles.rowActive]}>
-        <IconSymbol
-          name={isPlaying ? 'pause.fill' : 'play.fill'}
-          size={12}
-          color={isPlaying ? '#4a9eff' : '#555'}
-        />
+    <TouchableOpacity onPress={onPress} activeOpacity={0.5}>
+      <View style={styles.row}>
+        <ThemedText style={styles.index}>{String(index).padStart(2, '0')}</ThemedText>
         <View style={styles.trackInfo}>
           <ThemedText style={[styles.name, isPlaying && styles.nameActive]} numberOfLines={1}>
             {name}
@@ -27,40 +23,47 @@ export default function TrackRow({ name, description, isPlaying, onPress }: Prop
             <ThemedText style={styles.description} numberOfLines={1}>{description}</ThemedText>
           ) : null}
         </View>
-      </ThemedView>
+        <IconSymbol
+          name={isPlaying ? 'pause.fill' : 'play.fill'}
+          size={10}
+          color={isPlaying ? '#fff' : '#444'}
+        />
+      </View>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-row: {
+  row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    paddingVertical: 10,
-    paddingHorizontal: 4,
-    marginBottom: 8,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#ffffff11',
+    gap: 16,
+    paddingVertical: 14,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: '#ffffff33',
     backgroundColor: 'transparent',
   },
-  rowActive: {
-    borderBottomColor: '#ffffff11',
+  index: {
+    fontSize: 11,
+    opacity: 0.3,
+    fontVariant: ['tabular-nums'],
+    width: 20,
   },
   trackInfo: {
     flex: 1,
   },
   name: {
     fontSize: 14,
-    opacity: 0.8,
+    opacity: 0.7,
+    letterSpacing: 0.2,
   },
   nameActive: {
     opacity: 1,
-    color: '#4a9eff',
   },
   description: {
     fontSize: 11,
-    opacity: 0.4,
-    marginTop: 1,
+    opacity: 0.35,
+    marginTop: 2,
+    letterSpacing: 0.1,
   },
 });

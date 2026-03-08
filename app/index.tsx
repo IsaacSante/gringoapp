@@ -1,10 +1,11 @@
 import { Audio } from 'expo-av';
 import { useEffect, useRef, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
 import TrackRow from '@/components/track-row';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const TRACKS = [
   { id: '1', name: 'know what u know', description: '', src: require('@/assets/audio/song1.mp3') },
@@ -55,26 +56,29 @@ export default function HomeScreen() {
   };
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={{
-        paddingTop: insets.top + 20,
-        paddingHorizontal: 20,
-        paddingBottom: 40,
-      }}>
-      <ThemedText type="title" style={styles.title}>GRINGO</ThemedText>
-      <View>
-        {TRACKS.map((item) => (
-          <TrackRow
-            key={item.id}
-            name={item.name}
-            description={item.description}
-            isPlaying={playingId === item.id}
-            onPress={() => handlePress(item)}
-          />
-        ))}
-      </View>
-    </ScrollView>
+  <LinearGradient
+  colors={['#e3670e', '#1a0800']}
+  style={{ flex: 1 }}>
+  <ScrollView
+    style={styles.container}
+    contentContainerStyle={{
+      paddingTop: insets.top + 20,
+      paddingHorizontal: 20,
+      paddingBottom: 40,
+    }}>
+    <ThemedText type="title" style={styles.title}>GRINGO</ThemedText>
+    {TRACKS.map((item, i) => (
+      <TrackRow
+        key={item.id}
+        index={i + 1}
+        name={item.name}
+        description={item.description}
+        isPlaying={playingId === item.id}
+        onPress={() => handlePress(item)}
+      />
+    ))}
+  </ScrollView>
+</LinearGradient>
   );
 }
 
