@@ -1,7 +1,7 @@
 import { View, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { ThemedText } from '@/components/themed-text';
+import AnimatedTitle from '@/components/animated-title';
 import TrackContainer from '@/components/track-container';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -24,9 +24,9 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
 
   return (
-    <LinearGradient colors={['#e8f0fe', '#4a6fa5']} style={styles.gradient}>
+    <LinearGradient colors={['#355e3b', '#1a2f1e']} style={styles.gradient}>
       <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
-        <ThemedText type="title">GRINGO</ThemedText>
+        <AnimatedTitle />
       </View>
       <TrackContainer tracks={TRACKS} />
     </LinearGradient>
@@ -40,5 +40,6 @@ const styles = StyleSheet.create({
   header: {
     flex: 1,
     paddingHorizontal: 20,
+    alignItems: 'flex-end',
   },
 });

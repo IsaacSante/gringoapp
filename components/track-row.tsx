@@ -12,11 +12,12 @@ type Props = {
 export default function TrackRow({ index, name, description, isPlaying, onPress }: Props) {
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.5}>
+      <View style={styles.divider} />
       <View style={styles.row}>
-        <ThemedText style={styles.index}>{String(index).padStart(2, '0')}</ThemedText>
+        <ThemedText style={[styles.index, isPlaying && styles.indexActive]}>{String(index).padStart(2, '0')}</ThemedText>
         <View style={styles.trackInfo}>
           <ThemedText style={[styles.name, isPlaying && styles.nameActive]} numberOfLines={1}>
-            {name}
+            {name}{isPlaying ? ' ...' : ''}
           </ThemedText>
           {description ? (
             <ThemedText style={styles.description} numberOfLines={1}>{description}</ThemedText>
@@ -33,8 +34,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 16,
     paddingVertical: 14,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#ffffff33',
     backgroundColor: 'transparent',
   },
   index: {
@@ -54,10 +53,18 @@ const styles = StyleSheet.create({
   nameActive: {
     opacity: 1,
   },
+  indexActive: {
+    opacity: 1,
+  },
   description: {
     fontSize: 11,
     opacity: 0.35,
     marginTop: 2,
     letterSpacing: 0.1,
+  },
+  divider: {
+    width: '75%',
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: '#ffffff33',
   },
 });

@@ -9,8 +9,9 @@ type Props = {
   collapsedHeight: number;
 };
 
-const THUMB_SIZE = 18;
-const TRACK_WIDTH = 2;
+const THUMB_WIDTH = 12;
+const THUMB_HEIGHT = 20;
+const TRACK_WIDTH = 1;
 const RAIL_RATIO = 0.5;
 const TRANSITION_MS = 320;
 
@@ -22,9 +23,9 @@ export default function ScrollIndicator({ scrollY, viewportHeight, contentHeight
   const collapsedMaxScroll = Math.max(1, actualContent - collapsedHeight);
   const maxScroll = Math.max(collapsedMaxScroll, actualContent - viewportHeight);
   const railHeight = viewportHeight * RAIL_RATIO;
-  const maxThumbOffset = Math.max(0, railHeight - THUMB_SIZE);
+  const maxThumbOffset = Math.max(0, railHeight - THUMB_HEIGHT);
   const railTop = (viewportHeight - railHeight) / 2;
-  const lineLeft = (THUMB_SIZE - TRACK_WIDTH) / 2;
+  const lineLeft = (THUMB_WIDTH - TRACK_WIDTH) / 2;
 
   return (
     <View style={styles.container} pointerEvents="none">
@@ -123,29 +124,23 @@ const styles = StyleSheet.create({
     right: 16,
     top: 0,
     bottom: 0,
-    width: THUMB_SIZE,
+    width: THUMB_WIDTH,
   },
   line: {
     position: 'absolute',
     width: TRACK_WIDTH,
-    borderRadius: TRACK_WIDTH / 2,
-    backgroundColor: '#00000033',
+    backgroundColor: '#ffffff22',
   },
   rail: {
     position: 'absolute',
-    width: THUMB_SIZE,
+    width: THUMB_WIDTH,
   },
   thumb: {
-    width: THUMB_SIZE,
-    height: THUMB_SIZE,
-    borderRadius: THUMB_SIZE / 2,
-    backgroundColor: '#e8e8e8',
-    borderWidth: 0.5,
-    borderColor: '#b0b0b0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.25,
-    shadowRadius: 2,
-    elevation: 3,
+    width: THUMB_WIDTH,
+    height: THUMB_HEIGHT,
+    borderRadius: 2,
+    borderWidth: 1,
+    borderColor: '#ffffff',
+    backgroundColor: 'transparent',
   },
 });
