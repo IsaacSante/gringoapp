@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, LayoutChangeEvent, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import ControlsPanel from '@/components/controls-panel';
 import ScrollIndicator from '@/components/scroll-indicator';
 import TrackRow from '@/components/track-row';
 
@@ -22,6 +23,7 @@ type Props = {
 export default function TrackContainer({ tracks }: Props) {
   const soundRef = useRef<Audio.Sound | null>(null);
   const [playingId, setPlayingId] = useState<string | null>(null);
+  const [paused, setPaused] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const expandedRef = useRef(false);
   const { height: screenHeight } = useWindowDimensions();
@@ -100,6 +102,7 @@ export default function TrackContainer({ tracks }: Props) {
     const { sound } = await Audio.Sound.createAsync(track.src);
     soundRef.current = sound;
     setPlayingId(track.id);
+    setPaused(false);
     await sound.playAsync();
 
     sound.setOnPlaybackStatusUpdate((status) => {
@@ -108,9 +111,39 @@ export default function TrackContainer({ tracks }: Props) {
   };
 
 
+  const handlePlayPause = async () => {
+    if (!soundRef.current || !playingId) return;
+    const status = await soundRef.current.getStatusAsync();
+    if (status.isLoaded && status.isPlaying) {
+      await soundRef.current.pauseAsync();
+      setPaused(true);
+    } else if (status.isLoaded) {
+      await soundRef.current.playAsync();
+      setPaused(false);
+    }
+  };
+
+  const handleNext = () => {
+    const currentIndex = tracks.findIndex((t) => t.id === playingId);
+    const nextIndex = (currentIndex + 1) % tracks.length;
+    handlePress(tracks[nextIndex], nextIndex);
+  };
+
+  const handleShuffle = () => {
+    const randomIndex = Math.floor(Math.random() * tracks.length);
+    handlePress(tracks[randomIndex], randomIndex);
+  };
+
   return (
-    <Animated.View style={[styles.container, { height: animHeight }]}>
-      <View style={styles.scrollWrapper}>
+    <>
+      <ControlsPanel
+        isPlaying={playingId !== null && !paused}
+        onPlayPause={handlePlayPause}
+        onNext={handleNext}
+        onShuffle={handleShuffle}
+      />
+      <Animated.View style={[styles.container, { height: animHeight }]}>
+        <View style={styles.scrollWrapper}>
         <ScrollView
           ref={scrollRef}
           style={styles.scroll}
@@ -152,8 +185,9 @@ export default function TrackContainer({ tracks }: Props) {
           bottomPadding={Math.max(0, collapsedHeight - rowHeight)}
           collapsedHeight={collapsedHeight}
         />
-      </View>
-    </Animated.View>
+        </View>
+      </Animated.View>
+    </>
   );
 }
 
