@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
 import { ThemedText } from '@/components/themed-text';
+import { useEffect, useRef, useState } from 'react';
 
-const WORDS = ['GRINGO', 'DAN-AMP'];
+const WORDS = ['BULLMOON', 'DAN-AMP'];
 
 const SEQUENCES = [
   ['✦', '✶', '✸'],

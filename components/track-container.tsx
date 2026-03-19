@@ -1,10 +1,7 @@
 import { Audio } from 'expo-av';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, LayoutChangeEvent, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Animated, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 
-import ControlsPanel from '@/components/controls-panel';
-import ScrollIndicator from '@/components/scroll-indicator';
 import TrackRow from '@/components/track-row';
 
 const IDLE_TIMEOUT_MS = 4000;
@@ -18,21 +15,24 @@ type Track = {
 
 type Props = {
   tracks: Track[];
+  renderControls?: (controls: {
+    isPlaying: boolean;
+    onPlayPause: () => void;
+    onNext: () => void;
+    onPrev: () => void;
+    onShuffle: () => void;
+  }) => React.ReactNode;
 };
 
-export default function TrackContainer({ tracks }: Props) {
+export default function TrackContainer({ tracks, renderControls }: Props) {
   const soundRef = useRef<Audio.Sound | null>(null);
   const [playingId, setPlayingId] = useState<string | null>(null);
   const [paused, setPaused] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const expandedRef = useRef(false);
   const { height: screenHeight } = useWindowDimensions();
-  const insets = useSafeAreaInsets();
 
   const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const scrollY = useRef(new Animated.Value(0)).current;
-  const [viewportHeight, setViewportHeight] = useState(0);
-  const [contentHeight, setContentHeight] = useState(0);
   const animHeight = useRef(new Animated.Value(screenHeight / 3)).current;
   const scrollRef = useRef<ScrollView>(null);
   const rowOffsets = useRef<number[]>([]);
@@ -40,14 +40,6 @@ export default function TrackContainer({ tracks }: Props) {
 
   const collapsedHeight = screenHeight / 3;
   const expandedHeight = (screenHeight * 2) / 3;
-
-  // Stable scroll handler — created once so the native handler never reinstalls
-  const onScrollHandler = useRef(
-    Animated.event(
-      [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-      { useNativeDriver: false }
-    )
-  ).current;
 
   useEffect(() => {
     Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
@@ -129,6 +121,12 @@ export default function TrackContainer({ tracks }: Props) {
     handlePress(tracks[nextIndex], nextIndex);
   };
 
+  const handlePrev = () => {
+    const currentIndex = tracks.findIndex((t) => t.id === playingId);
+    const prevIndex = (currentIndex - 1 + tracks.length) % tracks.length;
+    handlePress(tracks[prevIndex], prevIndex);
+  };
+
   const handleShuffle = () => {
     const randomIndex = Math.floor(Math.random() * tracks.length);
     handlePress(tracks[randomIndex], randomIndex);
@@ -136,14 +134,14 @@ export default function TrackContainer({ tracks }: Props) {
 
   return (
     <>
-      <ControlsPanel
-        isPlaying={playingId !== null && !paused}
-        onPlayPause={handlePlayPause}
-        onNext={handleNext}
-        onShuffle={handleShuffle}
-      />
+      {renderControls?.({
+        isPlaying: playingId !== null && !paused,
+        onPlayPause: handlePlayPause,
+        onNext: handleNext,
+        onPrev: handlePrev,
+        onShuffle: handleShuffle,
+      })}
       <Animated.View style={[styles.container, { height: animHeight }]}>
-        <View style={styles.scrollWrapper}>
         <ScrollView
           ref={scrollRef}
           style={styles.scroll}
@@ -152,12 +150,8 @@ export default function TrackContainer({ tracks }: Props) {
             { paddingBottom: Math.max(0, collapsedHeight - rowHeight) },
           ]}
           showsVerticalScrollIndicator={false}
-          scrollEventThrottle={16}
-          onScroll={onScrollHandler}
           onScrollBeginDrag={resetIdleTimer}
           onMomentumScrollEnd={resetIdleTimer}
-          onLayout={(e: LayoutChangeEvent) => { setViewportHeight(e.nativeEvent.layout.height); }}
-          onContentSizeChange={(_w: number, h: number) => { setContentHeight(h); }}
         >
           {tracks.map((track, i) => (
             <View
@@ -177,15 +171,6 @@ export default function TrackContainer({ tracks }: Props) {
             </View>
           ))}
         </ScrollView>
-
-        <ScrollIndicator
-          scrollY={scrollY}
-          viewportHeight={viewportHeight}
-          contentHeight={contentHeight}
-          bottomPadding={Math.max(0, collapsedHeight - rowHeight)}
-          collapsedHeight={collapsedHeight}
-        />
-        </View>
       </Animated.View>
     </>
   );
@@ -194,16 +179,14 @@ export default function TrackContainer({ tracks }: Props) {
 const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
-  },
-  scrollWrapper: {
-    flex: 1,
-    position: 'relative',
+    backgroundColor: '#e8e6df',
+    zIndex: 1,
   },
   scroll: {
     flex: 1,
   },
   scrollContent: {
-    paddingLeft: 46,
-    paddingRight: 46,
+    paddingLeft: 0,
+    paddingRight: 0,
   },
 });

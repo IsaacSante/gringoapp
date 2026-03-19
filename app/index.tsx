@@ -2,6 +2,9 @@ import { View, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import AnimatedTitle from '@/components/animated-title';
+import AnimationDisplayPlaceholder from '@/components/animation-display-placeholder';
+import ControlsPanel from '@/components/controls-panel';
+import GrainOverlay from '@/components/grain-overlay';
 import TrackContainer from '@/components/track-container';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -24,11 +27,18 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
 
   return (
-    <LinearGradient colors={['#355e3b', '#1a2f1e']} style={styles.gradient}>
+    <LinearGradient colors={['#f0efe9', '#e8e6df']} style={styles.gradient}>
+      <GrainOverlay />
       <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
         <AnimatedTitle />
       </View>
-      <TrackContainer tracks={TRACKS} />
+      <AnimationDisplayPlaceholder />
+      <TrackContainer
+        tracks={TRACKS}
+        renderControls={(controls) => (
+          <ControlsPanel {...controls} />
+        )}
+      />
     </LinearGradient>
   );
 }
@@ -38,7 +48,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    flex: 1,
     paddingHorizontal: 20,
     alignItems: 'flex-end',
   },

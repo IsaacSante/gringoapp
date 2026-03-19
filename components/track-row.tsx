@@ -1,4 +1,5 @@
 import { ThemedText } from '@/components/themed-text';
+import { accentRed } from '@/constants/theme';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 type Props = {
@@ -34,11 +35,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 16,
     paddingVertical: 14,
+    paddingHorizontal: 28,
     backgroundColor: 'transparent',
   },
   index: {
     fontSize: 11,
-    opacity: 0.3,
+    opacity: 0.5,
     fontVariant: ['tabular-nums'],
     width: 20,
   },
@@ -47,7 +49,7 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 14,
-    opacity: 0.7,
+    opacity: 0.85,
     letterSpacing: 0.2,
   },
   nameActive: {
@@ -55,16 +57,21 @@ const styles = StyleSheet.create({
   },
   indexActive: {
     opacity: 1,
+    color: accentRed,
   },
   description: {
     fontSize: 11,
-    opacity: 0.35,
+    opacity: 0.55,
     marginTop: 2,
     letterSpacing: 0.1,
   },
   divider: {
-    width: '75%',
+    width: '100%',
     height: StyleSheet.hairlineWidth,
-    backgroundColor: '#ffffff33',
+    backgroundColor: '#00000044',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.25,
+    shadowRadius: 0,
   },
 });
