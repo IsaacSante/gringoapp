@@ -1,7 +1,8 @@
 import { ThemedText } from '@/components/themed-text';
 import { useEffect, useRef, useState } from 'react';
 
-const WORDS = ['BULLMOON', 'DAN-AMP'];
+const WORDS = new Set(['BULLMOON', 'DAN-AMP']);
+const WORDS_LIST = [...WORDS];
 
 const SEQUENCES = [
   ['✦', '✶', '✸'],
@@ -19,7 +20,7 @@ function randomSequence() {
 }
 
 export default function AnimatedTitle() {
-  const [display, setDisplay] = useState(WORDS[0]);
+  const [display, setDisplay] = useState(WORDS_LIST[0]);
   const wordIndex = useRef(0);
 
   useEffect(() => {
@@ -32,8 +33,8 @@ export default function AnimatedTitle() {
           frame++;
         } else {
           clearInterval(animInterval);
-          wordIndex.current = (wordIndex.current + 1) % WORDS.length;
-          setDisplay(WORDS[wordIndex.current]);
+          wordIndex.current = (wordIndex.current + 1) % WORDS_LIST.length;
+          setDisplay(WORDS_LIST[wordIndex.current]);
         }
       }, FRAME_MS);
     }, WORD_INTERVAL_MS);
@@ -41,7 +42,11 @@ export default function AnimatedTitle() {
     return () => clearInterval(interval);
   }, []);
 
+  const isWord = WORDS.has(display);
+
   return (
-    <ThemedText type="title">{display}</ThemedText>
+    <ThemedText type="title" style={isWord ? undefined : { fontFamily: 'DotGothic16' }}>
+      {display}
+    </ThemedText>
   );
 }

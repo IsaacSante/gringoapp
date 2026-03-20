@@ -2,7 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { accentRed } from '@/constants/theme';
+import { accentRed, Surface } from '@/constants/theme';
 
 type Props = {
   isPlaying: boolean;
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderTopWidth: 1,
     borderTopColor: '#00000055',
-    backgroundColor: '#f0efe9',
+    backgroundColor: Surface.panel,
   },
   section: {
     flex: 1,

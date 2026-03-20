@@ -45,9 +45,11 @@ const styles = StyleSheet.create({
     fontFamily: 'DotGothic16',
   },
   title: {
-    fontSize: 32,
-    lineHeight: 42,
-    fontFamily: 'DotGothic16',
+    fontSize: 26,
+    lineHeight: 34,
+    fontFamily: 'Anybody-Medium',
+    letterSpacing: 2,
+    color: '#3a3a3a',
   },
   subtitle: {
     fontSize: 20,

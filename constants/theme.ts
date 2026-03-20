@@ -7,7 +7,13 @@ import { Platform } from 'react-native';
 
 const tintColorLight = '#0a7ea4';
 const tintColorDark = '#fff';
-export const accentRed = '#cc2222';
+export const accentRed = '#b01515';
+
+export const SPACE_MODE = true;
+
+export const Surface = SPACE_MODE
+  ? { gradientTop: '#f4f5f7', gradientBottom: '#e8eaed', panel: '#f4f5f7', container: '#e8eaed' }
+  : { gradientTop: '#f0efe9', gradientBottom: '#e8e6df', panel: '#f0efe9', container: '#e8e6df' };
 
 export const Colors = {
   light: {

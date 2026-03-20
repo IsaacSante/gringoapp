@@ -6,6 +6,7 @@ import AnimationDisplayPlaceholder from '@/components/animation-display-placehol
 import ControlsPanel from '@/components/controls-panel';
 import GrainOverlay from '@/components/grain-overlay';
 import TrackContainer from '@/components/track-container';
+import { Surface } from '@/constants/theme';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const TRACKS = [
@@ -27,7 +28,7 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
 
   return (
-    <LinearGradient colors={['#f0efe9', '#e8e6df']} style={styles.gradient}>
+    <LinearGradient colors={[Surface.gradientTop, Surface.gradientBottom]} style={styles.gradient}>
       <GrainOverlay />
       <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
         <AnimatedTitle />

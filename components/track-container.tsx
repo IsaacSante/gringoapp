@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import TrackRow from '@/components/track-row';
+import { Surface } from '@/constants/theme';
 
 const IDLE_TIMEOUT_MS = 4000;
 
@@ -179,7 +180,7 @@ export default function TrackContainer({ tracks, renderControls }: Props) {
 const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
-    backgroundColor: '#e8e6df',
+    backgroundColor: Surface.container,
     zIndex: 1,
   },
   scroll: {

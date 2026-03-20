@@ -14,6 +14,7 @@ export default function RootLayout() {
 
   const [fontsLoaded] = useFonts({
     DotGothic16: require('@expo-google-fonts/dotgothic16/400Regular/DotGothic16_400Regular.ttf'),
+    'Anybody-Medium': require('@expo-google-fonts/anybody/500Medium/Anybody_500Medium.ttf'),
   });
 
   useEffect(() => {

@@ -1,13 +1,12 @@
-import { Image } from 'expo-image';
-import { StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 
 export default function AnimationDisplayPlaceholder() {
   return (
     <View style={styles.container}>
       <Image
-        source={require('@/assets/images/red_disk_trans_3.png')}
+        source={require('@/assets/images/white_disk.png')}
         style={styles.image}
-        contentFit="contain"
+        resizeMode="contain"
       />
     </View>
   );
